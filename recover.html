@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Senha - Coffee ON</title>
+    <script src="./js/enviroment.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f3f0;
+            color: #3b2f2f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #3b2f2f;
+        }
+
+        label {
+            display: block;
+            margin-top: 1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 1.5rem;
+            background-color: #3b2f2f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #5a4242;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .success,
+        .error {
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+
+        a {
+            display: block;
+            margin-top: 1rem;
+            text-align: center;
+            text-decoration: none;
+            color: #3b2f2f;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Recuperar Senha</h2>
+
+        <!-- Etapa 1: Solicitar código -->
+        <form id="formEtapa1">
+            <label for="email">E-mail cadastrado:</label>
+            <input type="email" id="email" name="email" required placeholder="seuemail@exemplo.com">
+
+            <button type="submit">Enviar código</button>
+        </form>
+
+        <!-- Etapa 2: Inserir código e nova senha -->
+        <form id="formEtapa2" class="hidden">
+            <label for="codigo">Código recebido:</label>
+            <input type="text" id="codigo" name="codigo" required placeholder="Ex: 123456">
+
+            <label for="novaSenha">Nova senha:</label>
+            <input type="password" id="novaSenha" name="novaSenha" required placeholder="Digite a nova senha">
+
+            <button type="submit">Redefinir senha</button>
+        </form>
+
+        <p id="msg" class="success hidden"></p>
+        <p id="err" class="error hidden"></p>
+
+        <a href="login.html">Voltar para login</a>
+    </div>
+
+    <script>
+        const formEtapa1 = document.getElementById('formEtapa1');
+        const formEtapa2 = document.getElementById('formEtapa2');
+        const msg = document.getElementById('msg');
+        const err = document.getElementById('err');
+        const emailInput = document.getElementById('email');
+
+        // Etapa 1: Solicitar o código
+        formEtapa1.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            msg.classList.add('hidden');
+            err.classList.add('hidden');
+
+            try {
+                const res = await fetch(`${API_BASE}/usuarios/recover`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailInput.value })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Erro ao enviar código.');
+
+                msg.textContent = data.message || 'Código enviado com sucesso!';
+                msg.classList.remove('hidden');
+
+                // Avança para etapa 2
+                formEtapa1.classList.add('hidden');
+                formEtapa2.classList.remove('hidden');
+
+            } catch (error) {
+                err.textContent = error.message;
+                err.classList.remove('hidden');
+            }
+        });
+
+        // Etapa 2: Redefinir senha
+        formEtapa2.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            msg.classList.add('hidden');
+            err.classList.add('hidden');
+
+            const codigo = document.getElementById('codigo').value;
+            const novaSenha = document.getElementById('novaSenha').value;
+
+            try {
+                const res = await fetch(`${API_BASE}/usuarios/reset`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: emailInput.value,
+                        codigo,
+                        novaSenha
+                    })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Erro ao redefinir senha.');
+
+                msg.textContent = 'Senha alterada com sucesso! Você já pode fazer login.';
+                msg.classList.remove('hidden');
+                formEtapa2.reset();
+
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+            } catch (error) {
+                err.textContent = error.message;
+                err.classList.remove('hidden');
+            }
+        });
+    </script>
+
+</body>
+
+</html>

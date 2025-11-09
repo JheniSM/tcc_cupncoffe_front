@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Coffee ON</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="./js/enviroment.js"></script>
+    <script src="./js/auth.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f3f0;
+            color: #3b2f2f;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .cards {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .chart-container {
+            width: 80%;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: #3b2f2f;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a id="adminLink" href="painel-adm.html">Admin</a>
+    </nav>
+
+    <h1 style="margin-top: 90px;">📊 Dashboard de Vendas</h1>
+
+    <div class="cards">
+        <div class="card">
+            <h3>Faturamento Total</h3>
+            <p id="totalVendas">R$ 0,00</p>
+        </div>
+        <div class="card">
+            <h3>Total de Pedidos</h3>
+            <p id="totalPedidos">0</p>
+        </div>
+        <div class="card">
+            <h3>Ticket Médio</h3>
+            <p id="ticketMedio">R$ 0,00</p>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="chartVendas"></canvas>
+    </div>
+
+    <div style="padding:20px">
+        <h2>🏆 Top Produtos</h2>
+        <table id="topProdutosTable">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Qtd Vendida</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <h2>👥 Top Clientes</h2>
+        <table id="topClientesTable">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Pedidos</th>
+                    <th>Total Gasto</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await fetch(`${API_BASE}/dashboard/resumo`, { credentials: 'include' });
+                const data = await res.json();
+
+                // Atualiza cards
+
+                document.getElementById('totalVendas').textContent = `R$ ${Number((data.totais.total_vendas || 0)).toFixed(2)}`;
+                document.getElementById('totalPedidos').textContent = Number(data.totais.total_pedidos || 0);
+                document.getElementById('ticketMedio').textContent = `R$ ${Number((data.totais.ticket_medio || 0)).toFixed(2)}`;
+
+                // Gráfico de vendas por mês
+                const ctx = document.getElementById('chartVendas');
+                const labels = data.porMes.map(r => r.mes);
+                const valores = data.porMes.map(r => r.total_mes);
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Vendas (R$)',
+                            data: valores,
+                            backgroundColor: '#3b2f2f'
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+
+                // Top produtos
+                const tbodyProdutos = document.querySelector('#topProdutosTable tbody');
+                data.topProdutos.forEach(p => {
+                    tbodyProdutos.innerHTML += `
+            <tr>
+              <td>${p.nome}</td>
+              <td>${p.quantidade_vendida}</td>
+              <td>R$ ${Number(p.total_vendido).toFixed(2)}</td>
+            </tr>`;
+                });
+
+                // Top clientes
+                const tbodyClientes = document.querySelector('#topClientesTable tbody');
+                data.topClientes.forEach(c => {
+                    tbodyClientes.innerHTML += `
+            <tr>
+              <td>${c.nome}</td>
+              <td>${c.pedidos}</td>
+              <td>R$ ${Number(c.total_gasto).toFixed(2)}</td>
+            </tr>`;
+                });
+            } catch (e) {
+                console.error('Erro ao carregar dashboard', e);
+            }
+        });
+    </script>
+</body>
+
+</html>

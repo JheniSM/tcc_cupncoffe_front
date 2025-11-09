@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Login - Coffee ON</title>
+    <script src="./js/enviroment.js"></script>
+    <script src="./js/auth.js"></script>
+    <script>
+        requireGuest(); // redireciona se já estiver logado
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f3f0;
+            color: #3b2f2f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 360px;
+        }
+
+        label {
+            display: block;
+            margin-top: 1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 1.2rem;
+            background-color: #3b2f2f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #5a4242;
+        }
+
+        #err {
+            color: red;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .link {
+            text-align: center;
+            display: block;
+            margin-top: 1rem;
+            color: #3b2f2f;
+            text-decoration: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Login Form -->
+    <form id="loginForm" autocomplete="on">
+        <h2>Entrar</h2>
+
+        <label>Email</label>
+        <input id="email" name="email" type="email" required autocomplete="username" value="admin@admin.com" />
+
+        <label>Senha</label>
+        <input id="password" name="password" type="password" required autocomplete="current-password" value="admin" />
+
+        <button type="submit">Entrar</button>
+        <button id="setUser" type="button">Usar conta padrão (role=USER)</button>
+
+        <a href="#" id="recoverLink" class="link">Esqueceu sua senha?</a>
+
+        <p id="err"></p>
+    </form>
+
+    <!-- Recuperar Senha -->
+    <form id="recoverForm" class="hidden">
+        <h2>Recuperar Senha</h2>
+
+        <label>E-mail cadastrado</label>
+        <input type="email" id="recoverEmail" placeholder="seuemail@exemplo.com" required />
+
+        <button id="btnSendCode" type="button">Enviar código</button>
+
+        <div id="recoverStep2" class="hidden">
+            <label>Código recebido</label>
+            <input type="text" id="recoverCode" placeholder="Ex: 123456" />
+
+            <label>Nova senha</label>
+            <input type="password" id="recoverNewPass" placeholder="Digite sua nova senha" />
+
+            <button id="btnResetPass" type="button">Redefinir senha</button>
+        </div>
+
+        <a href="#" id="backToLogin" class="link">Voltar ao login</a>
+
+        <p id="recoverMsg" style="text-align:center;margin-top:1rem;"></p>
+    </form>
+
+    <script>
+        const formLogin = document.getElementById('loginForm');
+        const formRecover = document.getElementById('recoverForm');
+        const recoverLink = document.getElementById('recoverLink');
+        const backToLogin = document.getElementById('backToLogin');
+        const errBox = document.getElementById('err');
+        const recoverMsg = document.getElementById('recoverMsg');
+
+        // Alterna telas
+        recoverLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            formLogin.classList.add('hidden');
+            formRecover.classList.remove('hidden');
+        });
+
+        backToLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            formRecover.classList.add('hidden');
+            formLogin.classList.remove('hidden');
+            recoverMsg.textContent = '';
+        });
+
+        // Login normal
+        document.getElementById('setUser').addEventListener('click', () => {
+            document.getElementById('email').value = "xxx@xxx.com";
+            document.getElementById('password').value = "xxx";
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('loginForm');
+
+            if (typeof requireGuest === 'function') requireGuest().catch(() => { });
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                errBox.style.display = 'none';
+                errBox.textContent = '';
+
+                const fd = new FormData(form);
+                const email = fd.get('email');
+                const password = fd.get('password');
+                if (!email || !password) {
+                    errBox.textContent = 'Preencha email e senha.';
+                    errBox.style.display = '';
+                    return;
+                }
+
+                const body = new URLSearchParams(fd);
+                try {
+                    const res = await fetch(`${API_BASE}/api/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body,
+                        credentials: 'include'
+                    });
+
+                    if (res.status === 204) {
+                        location.href = './index.html';
+                        return;
+                    }
+
+                    const j = await res.json();
+                    throw new Error(j.message || 'Falha no login');
+                } catch (err) {
+                    errBox.textContent = err.message || 'Erro ao entrar';
+                    errBox.style.display = '';
+                }
+            });
+        });
+
+        // Recuperar senha
+        document.getElementById('btnSendCode').addEventListener('click', async () => {
+            const email = document.getElementById('recoverEmail').value.trim();
+            recoverMsg.style.color = '';
+            if (!email) return alert('Informe seu e-mail.');
+
+            recoverMsg.textContent = 'Enviando código...';
+            try {
+                const res = await fetch(`${API_BASE}/usuarios/recover`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+
+                if (!res.ok) throw new Error(data.message);
+                recoverMsg.textContent = data.message;
+                recoverMsg.style.color = 'green';
+                document.getElementById('recoverStep2').classList.remove('hidden');
+            } catch (err) {
+                recoverMsg.textContent = err.message || 'Erro ao enviar código.';
+                recoverMsg.style.color = 'red';
+            }
+        });
+
+        document.getElementById('btnResetPass').addEventListener('click', async () => {
+            const email = document.getElementById('recoverEmail').value.trim();
+            const codigo = document.getElementById('recoverCode').value.trim();
+            const novaSenha = document.getElementById('recoverNewPass').value.trim();
+            recoverMsg.style.color = '';
+
+            if (!email || !codigo || !novaSenha)
+                return alert('Preencha todos os campos.');
+
+            recoverMsg.textContent = 'Atualizando senha...';
+            try {
+                const res = await fetch(`${API_BASE}/usuarios/reset`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, codigo, novaSenha })
+                });
+                const data = await res.json();
+
+                if (!res.ok) throw new Error(data.message);
+                recoverMsg.textContent = 'Senha redefinida com sucesso! Redirecionando...';
+                recoverMsg.style.color = 'green';
+
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+            } catch (err) {
+                recoverMsg.textContent = err.message || 'Erro ao redefinir senha.';
+                recoverMsg.style.color = 'red';
+            }
+        });
+    </script>
+</body>
+
+</html>

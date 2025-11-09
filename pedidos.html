@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coffe ON — Meus Pedidos</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css" />
+    <script src="./js/enviroment.js"></script>
+    <script src="./js/auth.js"></script>
+
+    <style>
+        .center-flex {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        th {
+            text-align: left;
+        }
+
+        .pedido-itens {
+            font-size: 0.9rem;
+            color: #444;
+        }
+
+        button {
+            cursor: pointer;
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        button.edit {
+            background-color: #f1c40f;
+        }
+
+        button.delete {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .status {
+            font-weight: 700;
+            text-transform: capitalize;
+        }
+
+        .admin-only {
+            display: none;
+        }
+
+        .admin .admin-only {
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a id="adminLink" href="painel-adm.html" style="display: none;">Admin</a>
+    </nav>
+
+    <div class="center-flex" style="margin-top: 90px; flex-direction: column; gap: 20px;">
+        <h1>Meus Pedidos</h1>
+        <table id="pedidosTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                    <th>Total (R$)</th>
+                    <th>Itens</th>
+                    <th>Feedback</th>
+                    <th class="admin-only">Ações</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+
+    </div>
+
+    <script src="./js/pedidos.js"></script>
+
+    <script>
+        (async () => {
+            if (!(await isAdmin())) return
+            document.getElementById('adminLink').style.display = 'block';
+        })();
+    </script>
+</body>
+
+</html>

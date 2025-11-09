@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel Administrativo - Coffee ON</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Roboto:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <script src="./js/enviroment.js"></script>
+    <script src="./js/auth.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #2e2a28;
+            color: #f7f3f0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        nav {
+            background-color: #3b2f2f;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        nav a {
+            color: #f7f3f0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #d1b38a;
+        }
+
+        header {
+            text-align: center;
+            padding: 3rem 1rem 2rem;
+        }
+
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: #d1b38a;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .admin-links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.2rem;
+            padding: 2rem;
+            max-width: 500px;
+            margin: auto;
+        }
+
+        .admin-links a {
+            background: #3b2f2f;
+            color: #fff;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            width: 100%;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .admin-links a:hover {
+            background: #d1b38a;
+            color: #2e2a28;
+            transform: scale(1.03);
+        }
+
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: #c7b8a1;
+            background: #3b2f2f;
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .admin-links a {
+                padding: 0.8rem 1rem;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">☕ Coffee ON</a>
+        <a href="logout" onclick="logoutAndRedirect()">Sair</a>
+    </nav>
+
+    <header>
+        <h1>Painel Administrativo</h1>
+    </header>
+
+    <section class="admin-links">
+        <a href="formulario-usuario.html">👤 Cadastro de Usuários</a>
+        <a href="formulario-produto.html">📦 Cadastro de Produtos</a>
+        <a href="dashboard.html">📊 Dashboard de Vendas</a>
+    </section>
+
+    <footer>
+        © 2025 Coffee ON — Sistema Administrativo
+    </footer>
+
+    <script>
+        (async () => {
+            const isLogged = await isAdmin();
+            if (!isLogged) location.href = '/login.html';
+        })();
+    </script>
+</body>
+
+</html>

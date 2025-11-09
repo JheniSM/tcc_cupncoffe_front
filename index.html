@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=SUSE+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:ital,wght@0,100..800;1,100..800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="./js/enviroment.js"></script>
+    <script src="./js/auth.js"></script>
+
+
+    <title>Coffe ON</title>
+</head>
+
+<body>
+    <nav>
+        <a href="#">Home</a>
+
+        <!-- aparecerá só para admin -->
+        <a id="adminLink" href="painel-adm.html" style="display:none;">Admin</a>
+        <a id="meusPedidos" href="pedidos.html" style="display:none;">Meus Pedidos</a>
+
+        <!-- info do usuário + sair -->
+        <div style="display: flex;gap:8px">
+            <button id="logoutBtn" type="button">Sair</button>
+            <button id="loginBtn" type="button">Logar</button>
+            <button id="cadastrarBtn" type="button" style="display:none;">Cadastrar</button>
+        </div>
+
+    </nav>
+
+    <header>
+        <h1>Coffe ON</h1>
+        <p>Onde cada grão conta uma história. Experimente o sabor autêntico do café feito com paixão e tradição.</p>
+    </header>
+
+    <section class="intro">
+        <h2>O sabor da autenticidade</h2>
+        <p>Do plantio à torra, nosso café é produzido de forma artesanal, respeitando o tempo e a qualidade do grão.
+            Cada xícara é uma experiência única que conecta você à origem.</p>
+    </section>
+
+    <section class="story">
+        <h3>Nossa história</h3>
+        <p>Fundada por amantes do café, nossa cafeteria nasceu com o propósito de oferecer uma experiência genuína.
+            Selecionamos grãos de origem controlada, moídos na hora, para preservar o aroma e o sabor inconfundíveis de
+            Selecionamos grãos de origem controlada, moídos na hora, para preservar o aroma e o sabor inconfundíveis de
+            um café artesanal.</p>
+        <p>Inspirados pelas antigas fazendas de café, criamos um espaço acolhedor, com design rústico e detalhes em
+            madeira, que convidam a desacelerar e apreciar o momento.</p>
+    </section>
+
+    <section id="Produtos"
+        style="background-color: #3b2f2f; padding: 2rem; display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center;">
+        <!-- Produtos serão carregados dinamicamente -->
+    </section>
+
+    <footer>
+        <p>© 2025 Cafeteria Artesanal — Todos os direitos reservados.</p>
+    </footer>
+
+    <button id="cartBtn" title="Abrir carrinho" style="
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #3b2f2f;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    ">
+        🛒
+    </button>
+
+    <dialog id="cartDialog" style="border: none; border-radius: 8px; padding: 20px; max-width: 400px;margin: auto;">
+        <h3>🛒 Carrinho</h3>
+
+        <div id="cartItems" style="margin: 40px 0;"></div>
+
+
+        <label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size: 12px;">
+            <input type="checkbox" id="chkEmbalagem" />
+            Embalagem econômica (R$ 1,00 por item)
+        </label>
+
+        <label style="display:flex;align-items:center;gap:6px;margin-top:8px;;font-size: 12px">
+            <input type="checkbox" id="chkMensagem" />
+            Adicionar mensagem personalizada (R$ 5,00)
+        </label>
+
+        <div id="mensagemWrapper" style="display:none; margin-top:6px;">
+            <textarea id="mensagemTexto" rows="2" placeholder="Digite sua mensagem..."
+                style="width:100%; resize:none;"></textarea>
+        </div>
+
+        <div id="cartTotal" style="margin-top: 10px; font-weight: bold;"></div>
+
+        <div style="margin-top: 16px; display: flex; justify-content: space-between;">
+            <button id="btnFechar">Fechar</button>
+            <button id="btnFinalizar">Finalizar Pedido</button>
+        </div>
+    </dialog>
+
+
+    <a id="whatsappButton"
+        href="https://wa.me/5599999999999?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20com%20meu%20pedido%20no%20Coffe%20ON."
+        target="_blank" class="whatsapp-float" title="Atendimento via WhatsApp">
+        💬 Falar com suporte
+    </a>
+
+    <script src="./js/produto.js"></script>
+    <script src="./js/carrinho.js"></script>
+
+    <script>
+        (async () => {
+            document.getElementById('loginBtn').addEventListener('click', () => {
+                location.href = '/login.html'
+            });
+            document.getElementById('cadastrarBtn').addEventListener('click', () => {
+                location.href = '/formulario-usuario.html'
+            });
+
+            document.getElementById('logoutBtn').addEventListener('click', logoutAndRedirect);
+
+            // 2) pega dados do usuário logado para decidir visibilidade do Admin
+            //    (se quiser algo mais robusto, devolva "role" em /api/me)
+            try {
+                const res = await fetch(`${API_BASE}/api/me`, { credentials: 'include', cache: 'no-store' });
+                if (!res.ok) {
+                    document.getElementById('logoutBtn').style.display = 'none';
+                    document.getElementById('loginBtn').style.display = 'block';
+                    document.getElementById('cadastrarBtn').style.display = '';
+                    return; // já teria redirecionado no requireAuth
+                }
+                document.getElementById('logoutBtn').style.display = 'block';
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('meusPedidos').style.display = 'block';
+
+                const user = await res.json();
+                const isAdmin = user.isAdmin
+
+                // mostra email
+                const emailEl = document.getElementById('userEmail');
+                if (emailEl && user?.email) emailEl.textContent = user.email;
+
+                if (isAdmin) {
+                    document.getElementById('adminLink').style.display = '';
+                    document.getElementById('cadastrarBtn').style.display = '';
+                }
+
+            } catch { }
+        })();
+
+        (async () => {
+            try {
+                const response = await get_produtos()
+                renderProdutosIndex(response)
+            } catch { }
+        })();
+    </script>
+
+</body>
+
+</html>
