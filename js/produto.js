@@ -50,6 +50,7 @@ async function delete_produto(id) {
 async function renderProdutos() {
     let produtos = await get_produtos();
     const tbody = document.querySelector('tbody');
+    if (!tbody) return
     tbody.innerHTML = '';
 
     produtos.forEach(p => {
@@ -137,7 +138,7 @@ async function handleFormSubmit(e) {
         }
 
 
-        document.getElementById('produtoForm').reset();
+        document.getElementById('produtoForm')?.reset();
         document.getElementById('id').value = '';
         document.getElementById('btnSalvar').textContent = 'Salvar';
         await renderProdutos();
@@ -216,6 +217,6 @@ function renderProdutosIndex(produtos) {
 
 document.addEventListener('DOMContentLoaded', async () => {
     await renderProdutos();
-    document.getElementById('produtoForm').addEventListener('submit', handleFormSubmit);
+    document.getElementById('produtoForm')?.addEventListener('submit', handleFormSubmit);
 });
 

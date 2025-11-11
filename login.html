@@ -171,7 +171,7 @@
 
                 const body = new URLSearchParams(fd);
                 try {
-                    const res = await fetch(`${API_BASE}/api/login`, {
+                    const res = await fetch(`${API_BASE}/login`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body,

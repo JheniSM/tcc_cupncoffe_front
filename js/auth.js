@@ -1,6 +1,6 @@
 async function isLoggedIn() {
     try {
-        const res = await fetch(`${API_BASE}/api/me`, {
+        const res = await fetch(`${API_BASE}/me`, {
             method: 'GET',
             credentials: 'include',      // envia/recebe o cookie HttpOnly
             cache: 'no-store',           // evita cache do navegador/proxy
@@ -14,7 +14,7 @@ async function isLoggedIn() {
 
 async function isAdmin() {
     try {
-        const res = await fetch(`${API_BASE}/api/me`, {
+        const res = await fetch(`${API_BASE}/me`, {
             method: 'GET',
             credentials: 'include',      // envia/recebe o cookie HttpOnly
             cache: 'no-store',           // evita cache do navegador/proxy
@@ -41,7 +41,7 @@ async function requireGuest() {
 
 // Helper de logout (ex: botão “Sair”)
 async function logoutAndRedirect() {
-    await fetch(`${API_BASE}/api/logout`, { method: 'POST', credentials: 'include' });
+    await fetch(`${API_BASE}/logout`, { method: 'POST', credentials: 'include' });
     location.href = './index.html';
 }
 

@@ -1,8 +1,5 @@
+dashboard instavel, contabilziando status difetentes para fazer calculos
 
-[] trazer desconto em tela se tem assinatura e cashback
-[] ajustar valores de embalagem economica
 
-melhorias dos testes
-    [todo back com resolução] não deixar excluir o admin root ou ser obrigatorio 1 admin pelo menos.
-    [] melhorar renderização das imanges. (centralizada)
-    [] bug da embalagem quando marca a embalagem economica e depois seleciona 
+pm2 restart tcc-api
+pm2 flush tcc-api
