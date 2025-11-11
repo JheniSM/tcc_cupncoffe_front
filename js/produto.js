@@ -185,7 +185,7 @@ function renderProdutosIndex(produtos) {
                     <div style="font-size: 13px; text-align: center; font-weight: 700;">
                         ${p.nome}
                     </div>
-                    <img style="width: 80%; border-radius: 4px;"
+                    <img style="width: 80%; border-radius: 4px;margin: auto;"
                          src="${p.imagem || 'https://via.placeholder.com/150?text=Sem+Imagem'}"
                          alt="${p.nome}">
                     <div style="font-size: 13px; text-align: center; font-weight: 700;margin-top:auto">

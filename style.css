@@ -28,7 +28,7 @@ body {
 }
 
 header {
-    background-image: url('https://images.unsplash.com/photo-1511920170033-f8396924c348');
+    background-image: url('http://69.6.250.32/bg.png');
     background-size: cover;
     background-position: center;
     color: white;
@@ -38,14 +38,14 @@ header {
 
 header h1 {
     font-size: 3rem;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+    text-shadow: -3px 3px 3px rgb(0 0 0 / 73%);
 }
 
 header p {
     font-size: 1.3rem;
     max-width: 600px;
     margin: 1rem auto;
-    text-shadow: 0px 1px 20px rgb(0 0 0);
+    text-shadow: -3px 3px 3px rgb(0 0 0 / 73%);
 }
 
 section {

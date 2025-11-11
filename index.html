@@ -18,7 +18,7 @@
     <script src="./js/auth.js"></script>
 
 
-    <title>Coffe ON</title>
+    <title>Cake'n'Coffe</title>
 </head>
 
 <body>
@@ -42,14 +42,15 @@
     </nav>
 
     <header>
-        <h1>Coffe ON</h1>
-        <p>Onde cada grão conta uma história. Experimente o sabor autêntico do café feito com paixão e tradição.</p>
+        <h1>Cake'n'Coffe</h1>
+        <p>Experimente o encontro perfeito entre café de origem e cupcakes artesanais — frescos, fofinhos e feitos com
+            ingredientes selecionados.</p>
     </header>
 
     <section class="intro">
         <h2>O sabor da autenticidade</h2>
-        <p>Do plantio à torra, nosso café é produzido de forma artesanal, respeitando o tempo e a qualidade do grão.
-            Cada xícara é uma experiência única que conecta você à origem.</p>
+        <p>Autenticidade no grão, afeto na cobertura. Cupcakes e cafés preparados na hora para o seu melhor intervalo.
+        </p>
     </section>
 
     <section class="story">
@@ -151,12 +152,15 @@
                 const user = await res.json();
                 const isAdmin = user.isAdmin
 
-                document.getElementById('usernomewrapper').style.display = 'block';
-                document.getElementById('usernome').textContent = user.nome;
+
                 document.getElementById('logoutBtn').style.display = 'block';
                 document.getElementById('loginBtn').style.display = 'none';
                 document.getElementById('meusPedidos').style.display = 'block';
 
+                if (user) {
+                    document.getElementById('usernomewrapper').style.display = 'block';
+                    document.getElementById('usernome').textContent = user.nome;
+                }
 
                 // mostra email
                 const emailEl = document.getElementById('userEmail');
