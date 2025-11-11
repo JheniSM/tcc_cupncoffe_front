@@ -27,16 +27,20 @@ function adicionarAoCarrinho(produto) {
             .filter(p => !p.nome.includes('Mensagem'))
             .reduce((acc, p) => acc + p.quantidade, 0);
 
-        let embalagem = carrinho.find(p => !p.nome.includes('Embalagem')) || window.embalagem
-        if (!embalagem) {
-            carrinho.push({
-                id: embalagem.id,
-                nome: embalagem.nome,
-                preco: embalagem.preco,
-                quantidade: totalItens
-            });
+        let itemEmbalagem = carrinho.find(p => p.nome.includes('Embalagem'));
+
+        if (!itemEmbalagem) {
+            const e = window.embalagem; // precisa estar definido no escopo global
+            if (e) {
+                carrinho.push({
+                    id: e.id,
+                    nome: e.nome,
+                    preco: e.preco,
+                    quantidade: totalItens
+                });
+            }
         } else {
-            embalagem.quantidade = totalItens;
+            itemEmbalagem.quantidade = totalItens;
         }
     }
 
@@ -109,11 +113,12 @@ function alterarQtd(id, delta) {
             .filter(p => !p.nome.includes('Mensagem'))
             .reduce((acc, p) => acc + p.quantidade, 0);
 
-        // se o carrinho ficou vazio, remove embalagem também
+        // se o carrinho ficou vazio, remove embalagem e mensagem também
         if (totalItens === 0) {
             carrinho = carrinho.filter(p => !p.nome.includes('Embalagem'));
             carrinho = carrinho.filter(p => !p.nome.includes('Mensagem'));
-            document.getElementById('chkEmbalagem').checked = false;
+            const chk = document.getElementById('chkEmbalagem');
+            if (chk) chk.checked = false;
         } else {
             embalagem.quantidade = totalItens;
         }
@@ -131,7 +136,7 @@ function toggleEmbalagem(checked) {
     let carrinho = getCarrinho();
     const embalagem = carrinho.find(p => p.nome.includes('Embalagem'));
 
-    // calcula total de itens (sem contar embalagem)
+    // calcula total de itens (sem contar embalagem e mensagem)
     const totalItens = carrinho
         .filter(p => !p.nome.includes('Embalagem'))
         .filter(p => !p.nome.includes('Mensagem'))
@@ -183,16 +188,33 @@ async function finalizarPedido() {
             credentials: 'include',
             body: JSON.stringify(pedido)
         });
-        const responseJson = await res.json()
+        const responseJson = await res.json();
         if (!res.ok) throw new Error(responseJson?.message || 'Falha ao enviar pedido');
 
         alert('🧾 Pedido enviado com sucesso!');
+
+        // limpa carrinho persistido
         localStorage.removeItem('carrinho');
+
+        // ✅ reseta UI dos extras para não ficar marcado no próximo pedido
+        const chkEmbalagem = document.getElementById('chkEmbalagem');
+        if (chkEmbalagem) chkEmbalagem.checked = false;
+
+        const chkMensagem = document.getElementById('chkMensagem');
+        if (chkMensagem) chkMensagem.checked = false;
+
+        const msgInput = document.getElementById('mensagemTexto');
+        if (msgInput) msgInput.value = '';
+
+        const wrapper = document.getElementById('mensagemWrapper');
+        if (wrapper) wrapper.style.display = 'none';
+
         fecharCarrinho();
     } catch (e) {
         alert(e.message);
     }
 }
+
 
 // ===============================
 // Mensagem personalizada
