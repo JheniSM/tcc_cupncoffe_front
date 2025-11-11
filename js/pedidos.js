@@ -76,7 +76,6 @@ async function renderPedidos() {
 
     pedidos.forEach(p => {
         const tr = document.createElement('tr');
-
         // Se o pedido estiver concluído, mostra estrelas
         let feedbackHtml = '';
         if (p.status === 'CONCLUIDO') {
@@ -94,7 +93,7 @@ async function renderPedidos() {
       <td>${p.id}</td>
       <td class="status">${p.status}</td>
       <td>${new Date(p.created_at).toLocaleString()}</td>
-      <td>${p.total_itens?.toFixed(2) || '0.00'}</td>
+      <td>${p.total_final?.toFixed(2) || '0.00'}</td>
       <td><button onclick="verDetalhes(${p.id})">👁️ Ver Itens</button></td>
       <td>${feedbackHtml}</td>
       <td class="admin-only">
